@@ -1,0 +1,2 @@
+Ideja ir programmatūra, kas ņem attēlus un lieto mākslinieciskos filtrus, kuru pamatā ir unikoda rakstzīmes. Tas pārvērš attēla pikseļus unikoda rakstzīmēs. Tā kā unikodā ir ļoti daudz blokus, no vienkāršām zīmēm līdz emotikonām, būs pieejami vairāki filtri, piemēram, izmantojot tikai rakstzīmes vai tikai emotikoni. Visi apstrādātie attēli tiks saglabāti datu bāzē ar to unikoda līdziniekiem un parādīti attēlu galerijā tīmekļā vietnē.
+
