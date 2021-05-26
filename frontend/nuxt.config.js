@@ -50,7 +50,7 @@ export default {
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: 'https://localhost:8080'
+      baseURL: 'http://localhost:8080'
     },
     objectIdRegExp: /^[0-9a-fA-F]{24}$/
   },

@@ -77,14 +77,22 @@
             Augšupielādēt
           </b-btn>
         </b-col>
-        <b-col cols="6">
-          <transition name="fade">
-            <b-btn v-if="generatedImage" block variant="info" class="mt-4">
+      </b-row>
+      <transition name="fade">
+        <b-row class="mt-3" v-if="generatedImage">
+          <b-col cols="6">
+            <label style="width: 100%">
+              Nosaukums <base-required />
+              <b-form-input v-model="image.title" />
+            </label>
+          </b-col>
+          <b-col cols="6">
+            <b-btn :disabled="!image.title" block variant="info" class="mt-4" @click="saveImage">
               Saglabāt
             </b-btn>
-          </transition>
-        </b-col>
-      </b-row>
+          </b-col>
+        </b-row>
+      </transition>
     </b-col>
     <b-col cols="3">
       <b-card border-variant="info" bg-variant="info" no-body style="border-radius: 20px; overflow: hidden">
@@ -117,6 +125,7 @@ import imagvue from 'imagvue'
 })
 export default class CreateUnicodeImagePage extends Vue {
   image = {
+    title: '',
     src: null,
     width: 50,
     processing: {
@@ -132,7 +141,7 @@ export default class CreateUnicodeImagePage extends Vue {
     braille: {
       invert: false,
       dither: false
-    }
+    },
   }
 
   imageSrc: any = null
@@ -212,22 +221,24 @@ export default class CreateUnicodeImagePage extends Vue {
   }
 
   async saveImage () {
-    const image = {
-      title: '',
-      width: this.image.width,
-      filterId: this.image.filterId,
-      image: this.imageSrc,
-      createdAt: new Date(),
-      processedImage: this.generatedImage
-    }
+    if (confirm('Vai tiešām vēlaties saglabāt šo attēlu datu bāzē?')) {
+      const image = {
+        title: this.image.title,
+        width: this.image.width,
+        filterId: this.image.filterId,
+        image: this.imageSrc,
+        createdAt: new Date(),
+        processedImage: this.generatedImage
+      }
 
-    await this.$store.dispatch('api/saveImage', image).then(() => {
-      this.$router.push('/')
-      alert('Saglabāts datu bāzē')
-    }).catch((e) => {
-      alert('Kļūda')
-      console.log(e)
-    })
+      await this.$store.dispatch('api/saveImage', image).then(() => {
+        this.$router.push('/')
+        alert('Saglabāts datu bāzē')
+      }).catch((e) => {
+        alert('Kļūda')
+        console.log(e)
+      })
+    }
   }
 }
 </script>

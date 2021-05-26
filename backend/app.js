@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors')
 
 mongoose.Promise = require('bluebird');
 mongoose.connect('mongodb+srv://admin:admin@cluster0.jpaeu.mongodb.net/UnicodeConverter?retryWrites=true&w=majority', {
@@ -30,6 +31,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors())
 
 app.use('/', routes);
 
