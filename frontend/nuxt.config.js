@@ -50,7 +50,7 @@ export default {
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: 'http://localhost:8080'
+      baseURL: 'https://pit-assignment.herokuapp.com'
     },
     objectIdRegExp: /^[0-9a-fA-F]{24}$/
   },
