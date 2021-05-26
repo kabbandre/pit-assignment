@@ -27,23 +27,12 @@ interface Image {
   components: { GalleryEntry }
 })
 export default class GalleryPage extends Vue {
-  example: Image[] = [
-    {
-      image: 'https://picsum.photos/200/300',
-      title: 'Da Vinky',
-      filterId: 1,
-      createdAt: '03/04/2021'
-    }
-  ]
-
   get gallery (): Image[] {
-    let example = this.example
+    return this.$store.state.api.images
+  }
 
-    for (let i = 0; i < 4; i++) {
-      example = example.concat(example)
-    }
-
-    return example
+  async mounted () {
+    await this.$store.dispatch('api/getAllImages')
   }
 }
 </script>

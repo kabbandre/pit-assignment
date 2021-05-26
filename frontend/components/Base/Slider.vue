@@ -29,7 +29,7 @@ export default {
       type: String,
       default: ''
     },
-    initValue: { type: Number, default: 50 },
+    initValue: { type: [Number, String], default: 50 },
     value: {
       type: [String, Number],
       default: '50'

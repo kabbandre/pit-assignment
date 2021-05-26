@@ -28,6 +28,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/vue-clipboard'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -49,7 +50,7 @@ export default {
 
   publicRuntimeConfig: {
     axios: {
-      baseURL: 'https://localhost:4080'
+      baseURL: 'https://localhost:8080'
     },
     objectIdRegExp: /^[0-9a-fA-F]{24}$/
   },

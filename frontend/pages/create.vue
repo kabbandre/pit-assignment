@@ -14,52 +14,75 @@
             <b-form-input v-model="image.width" type="number" />
           </label>
         </b-col>
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider v-model="image.processing.contrast" init-value="100" label="Kontrasts" />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider v-model="image.processing.brightness" init-value="100" max="1000" label="Spilgtums" />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider v-model="image.processing.hueRotate" init-value="0" max="360" label="Krāsa" />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider v-model="image.processing.saturate" init-value="100" label="Piesātinājums" />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider v-model="image.processing.blur" init-value="0" label="Blur" />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider-->
+        <!--            v-model="image.processing.grayscale"-->
+        <!--            init-value="0"-->
+        <!--            label="Pelēktons"-->
+        <!--          />-->
+        <!--        </b-col>-->
+        <!--        <b-col cols="6">-->
+        <!--          <base-slider-->
+        <!--            v-model="image.processing.invert"-->
+        <!--            init-value="0"-->
+        <!--            label="Invertēt"-->
+        <!--          />-->
+        <!--        </b-col>-->
         <b-col cols="6">
-          <base-slider v-model="image.processing.contrast" init-value="100" label="Kontrasts" />
-        </b-col>
-        <b-col cols="6">
-          <base-slider v-model="image.processing.brightness" init-value="100" max="1000" label="Spilgtums" />
-        </b-col>
-        <b-col cols="6">
-          <base-slider v-model="image.processing.hueRotate" init-value="0" max="360" label="Krāsa" />
-        </b-col>
-        <b-col cols="6">
-          <base-slider v-model="image.processing.saturate" init-value="100" label="Piesātinājums" />
-        </b-col>
-        <b-col cols="6">
-          <base-slider v-model="image.processing.blur" init-value="0" label="Blur" />
-        </b-col>
-        <b-col cols="6">
-          <base-slider
-            v-model="image.processing.grayscale"
-            init-value="0"
-            label="Pelēktons"
-          />
-        </b-col>
-        <b-col cols="6">
-          <base-slider
-            v-model="image.processing.invert"
-            init-value="0"
-            label="Invertēt"
-          />
-        </b-col>
-        <b-col align-self="flex-end" cols="6">
           <label style="width: 100%">
             Filtrs <base-required />
             <b-form-select v-model="image.filterId" placeholder="Filtrs">
-              <b-form-select-option value="1">
+              <b-form-select-option :value="1">
                 ASCII
               </b-form-select-option>
-              <b-form-select-option value="2">
+              <b-form-select-option :value="2">
                 Braila raksts
               </b-form-select-option>
             </b-form-select>
           </label>
         </b-col>
-        <b-col align-self="flex-end" cols="6">
-          <b-btn class="mt-4" variant="info" block>
+        <b-col style="margin-top: 18px" cols="6">
+          <transition name="fade">
+            <template v-if="image.filterId === 2">
+              <b-checkbox v-model="image.braille.dither">
+                Uztraukums (Dither)
+              </b-checkbox>
+            </template>
+          </transition>
+          <transition name="fade">
+            <template v-if="image.filterId === 2">
+              <b-checkbox v-model="image.braille.invert">
+                Invertēt
+              </b-checkbox>
+            </template>
+          </transition>
+        </b-col>
+        <b-col cols="6">
+          <b-btn :disabled="generatingArt || !imageSrc || !image.filterId" class="mt-4" variant="info" block @click="initGenerator(imageSrc, image.filterId)">
             Augšupielādēt
           </b-btn>
+        </b-col>
+        <b-col cols="6">
+          <transition name="fade">
+            <b-btn v-if="generatedImage" block variant="info" class="mt-4">
+              Saglabāt
+            </b-btn>
+          </transition>
         </b-col>
       </b-row>
     </b-col>
@@ -71,6 +94,9 @@
           style="width: 100%; height: 250px; object-fit: cover"
         />
       </b-card>
+    </b-col>
+    <b-col class="mt-4" cols="12">
+      <b-textarea v-model="generatedImage" rows="40" readonly />
     </b-col>
   </b-form-row>
 </template>
@@ -92,7 +118,7 @@ import imagvue from 'imagvue'
 export default class CreateUnicodeImagePage extends Vue {
   image = {
     src: null,
-    width: null,
+    width: 50,
     processing: {
       contrast: '100',
       brightness: '100',
@@ -102,10 +128,17 @@ export default class CreateUnicodeImagePage extends Vue {
       grayscale: '0',
       invert: '0'
     },
-    filterId: null
+    filterId: null,
+    braille: {
+      invert: false,
+      dither: false
+    }
   }
 
   imageSrc: any = null
+  generatingArt = false
+
+  generatedImage = ''
 
   @Watch('image.src')
   async onImageChange (newValue: File | null) {
@@ -131,5 +164,79 @@ export default class CreateUnicodeImagePage extends Vue {
       reader.onerror = error => reject(error)
     })
   }
+
+  async initGenerator (imageUrl: string, filterId: number) {
+    this.generatingArt = true
+
+    switch (filterId) {
+      case 1:
+        await this.imageToAscii(imageUrl)
+        break
+      case 2:
+        await this.imageToBraill(imageUrl)
+        break
+      default:
+        break
+    }
+
+    this.$copyText(this.generatedImage).then(() => {
+      alert('Saglabāts starpliktuvē')
+    }).catch((e) => {})
+
+    this.generatingArt = false
+  }
+
+  async imageToAscii (imageURL: string) {
+    const getAsciiImage = require('get-ascii-image')
+
+    const config = {
+      maxWidth: this.image.width
+    }
+
+    await getAsciiImage(imageURL, config)
+      .then((ascii: string) => {
+        // @ts-ignore
+        this.generatedImage = ascii
+      })
+      .catch((err: any) => {
+        console.log(err)
+      })
+  }
+
+  async imageToBraill (imageURL: string) {
+    const { braillefy } = require('img2braille-web')
+
+    const asciiOpts = this.image.braille
+
+    this.generatedImage = await braillefy(imageURL, this.image.width, asciiOpts)
+  }
+
+  async saveImage () {
+    const image = {
+      title: '',
+      width: this.image.width,
+      filterId: this.image.filterId,
+      image: this.imageSrc,
+      createdAt: new Date(),
+      processedImage: this.generatedImage
+    }
+
+    await this.$store.dispatch('api/saveImage', image).then(() => {
+      this.$router.push('/')
+      alert('Saglabāts datu bāzē')
+    }).catch((e) => {
+      alert('Kļūda')
+      console.log(e)
+    })
+  }
 }
 </script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>

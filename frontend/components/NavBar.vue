@@ -9,10 +9,10 @@
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item to="/">
-          Gallery
+          Galerija
         </b-nav-item>
         <b-nav-item to="/create">
-          Create your own
+          Izveidot savu
         </b-nav-item>
       </b-navbar-nav>
     </b-collapse>
